@@ -93,13 +93,11 @@
     to   { transform:scale(1); opacity:1; }
   }
 
-  /* FRAME SIDES - rendered with JS */
   .frame-side {
     position: absolute;
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 0;
     pointer-events: none;
   }
   .frame-flower {
@@ -118,7 +116,6 @@
     100% { transform:scale(1); opacity:1; }
   }
 
-  /* CORNERS */
   .corner {
     position: absolute;
     font-size: clamp(1.8rem, 5vw, 2.8rem);
@@ -135,54 +132,46 @@
   .corner.br { bottom:-10px; right:-10px; }
 
   /* ===== TEXT INSIDE FRAME ===== */
-  .content-inside {
-    text-align: center;
-    z-index: 2;
-  }
+  .content-inside { text-align:center; z-index:2; }
 
   .feliz-text {
-    font-family: 'Pacifico', cursive;
-    font-size: clamp(3rem, 12vw, 7rem);
-    line-height: 1.1;
-    background: linear-gradient(160deg, #fff7a1 0%, #ffd700 40%, #ffab00 70%, #ffe066 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-    filter: drop-shadow(0 4px 16px rgba(255,200,0,0.6));
-    animation: textPulse 2.5s ease-in-out infinite;
-    display: block;
+    font-family:'Pacifico',cursive;
+    font-size:clamp(3rem,12vw,7rem);
+    line-height:1.1;
+    background:linear-gradient(160deg,#fff7a1 0%,#ffd700 40%,#ffab00 70%,#ffe066 100%);
+    -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text;
+    filter:drop-shadow(0 4px 16px rgba(255,200,0,0.6));
+    animation:textPulse 2.5s ease-in-out infinite;
+    display:block;
   }
   .dia-text {
-    font-family: 'Pacifico', cursive;
-    font-size: clamp(3rem, 12vw, 7rem);
-    line-height: 1.1;
-    background: linear-gradient(160deg, #fff7a1 0%, #ffd700 40%, #ffab00 70%, #ffe066 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-    filter: drop-shadow(0 4px 16px rgba(255,200,0,0.6));
-    animation: textPulse 2.5s 0.3s ease-in-out infinite;
-    display: block;
+    font-family:'Pacifico',cursive;
+    font-size:clamp(3rem,12vw,7rem);
+    line-height:1.1;
+    background:linear-gradient(160deg,#fff7a1 0%,#ffd700 40%,#ffab00 70%,#ffe066 100%);
+    -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text;
+    filter:drop-shadow(0 4px 16px rgba(255,200,0,0.6));
+    animation:textPulse 2.5s 0.3s ease-in-out infinite;
+    display:block;
   }
   @keyframes textPulse {
     0%,100% { filter:drop-shadow(0 4px 16px rgba(255,200,0,0.5)); }
     50%     { filter:drop-shadow(0 4px 35px rgba(255,220,0,1)); }
   }
 
-  .jimena-sub {
-    font-family: 'Dancing Script', cursive;
-    font-size: clamp(1.4rem, 5vw, 2.2rem);
-    color: #ffe87a;
-    margin-top: 10px;
-    opacity: 0;
-    animation: fadeUp 0.8s 1.2s forwards;
+  .name-sub {
+    font-family:'Dancing Script',cursive;
+    font-size:clamp(1.4rem,5vw,2.2rem);
+    color:#ffe87a;
+    margin-top:10px;
+    opacity:0;
+    animation:fadeUp 0.8s 1.2s forwards;
   }
   @keyframes fadeUp {
     from { opacity:0; transform:translateY(15px); }
     to   { opacity:1; transform:translateY(0); }
   }
 
-  /* burst */
   .burst { position:fixed; pointer-events:none; z-index:999; font-size:2rem; animation:burstAnim 1.5s ease-out forwards; }
   @keyframes burstAnim {
     0%  { opacity:1; transform:translate(0,0) scale(1.3) rotate(0deg); }
@@ -207,171 +196,149 @@
 <!-- PANTALLA 2 -->
 <div id="screen-feliz">
   <div class="frame-wrapper" id="frameWrapper">
-    <!-- corners -->
     <div class="corner tl">🌻</div>
     <div class="corner tr">🌻</div>
     <div class="corner bl">🌻</div>
     <div class="corner br">🌻</div>
 
-    <!-- flower border sides injected by JS -->
     <div class="frame-side" id="sideTop"></div>
     <div class="frame-side" id="sideBottom"></div>
     <div class="frame-side" id="sideLeft" style="flex-direction:column;"></div>
     <div class="frame-side" id="sideRight" style="flex-direction:column;"></div>
 
-    <!-- CONTENT -->
     <div class="content-inside">
       <span class="feliz-text">¡FELIZ</span>
       <span class="dia-text">DÍA!</span>
-      <div class="jimena-sub">🌻 Jimena 🌻</div>
+      <div class="name-sub" id="nameSub"></div>
     </div>
   </div>
 </div>
 
 <script>
-// ===== BUILD FLOWER FRAME =====
-const TOP_FLOWERS    = ['🌻','🌼','⭐','🌼','🌻','🌼','⭐','🌼'];
-const SIDE_FLOWERS   = ['🌼','🌻','⭐','🌻','🌼','🌻','⭐','🌻'];
+  // Nombres permitidos y su emoji especial
+  const NOMBRES = {
+    'jimena': { display: 'Jimena', emoji: '🌻' },
+    'vaga':   { display: 'Vaga',   emoji: '🌼' },
+  };
 
-function buildFrame() {
-  const wrapper = document.getElementById('frameWrapper');
-  const W = wrapper.offsetWidth;
-  const H = wrapper.offsetHeight;
+  const TOP_FLOWERS  = ['🌻','🌼','⭐','🌼','🌻','🌼','⭐','🌼'];
+  const SIDE_FLOWERS = ['🌼','🌻','⭐','🌻','🌼','🌻','⭐','🌻'];
 
-  const flSize = Math.max(28, Math.min(36, W * 0.055)); // flower size px approx
-  const gap = 2;
-  const step = flSize + gap;
+  function buildFrame() {
+    const wrapper = document.getElementById('frameWrapper');
+    const W = wrapper.offsetWidth;
+    const H = wrapper.offsetHeight;
+    const gap = 2;
+    const flSize = Math.max(28, Math.min(36, W * 0.055));
+    const step = flSize + gap;
+    const hCount = Math.floor((W - flSize) / step);
+    const vCount = Math.floor((H - flSize) / step);
 
-  const hCount = Math.floor((W - flSize) / step);
-  const vCount = Math.floor((H - flSize) / step);
+    ['sideTop','sideBottom'].forEach((id, idx) => {
+      const el = document.getElementById(id);
+      el.style[idx === 0 ? 'top' : 'bottom'] = '-28px';
+      el.style.left = '0'; el.style.right = '0';
+      el.style.gap = gap + 'px';
+      el.innerHTML = '';
+      for (let i = 0; i < hCount; i++) {
+        const s = document.createElement('span');
+        s.className = 'frame-flower';
+        s.textContent = TOP_FLOWERS[i % TOP_FLOWERS.length];
+        s.style.animationDelay = `${i * 0.08}s, ${i * 0.1}s`;
+        el.appendChild(s);
+      }
+    });
 
-  // TOP
-  const top = document.getElementById('sideTop');
-  top.style.top = '-28px';
-  top.style.left = '0'; top.style.right = '0';
-  top.style.gap = gap + 'px';
-  top.innerHTML = '';
-  for (let i = 0; i < hCount; i++) {
-    const s = document.createElement('span');
-    s.className = 'frame-flower';
-    s.textContent = TOP_FLOWERS[i % TOP_FLOWERS.length];
-    s.style.animationDelay = `${i * 0.08}s, ${i * 0.1}s`;
-    top.appendChild(s);
+    ['sideLeft','sideRight'].forEach((id, idx) => {
+      const el = document.getElementById(id);
+      el.style[idx === 0 ? 'left' : 'right'] = '-28px';
+      el.style.top = '0'; el.style.bottom = '0';
+      el.style.gap = gap + 'px';
+      el.innerHTML = '';
+      for (let i = 0; i < vCount; i++) {
+        const s = document.createElement('span');
+        s.className = 'frame-flower';
+        s.textContent = SIDE_FLOWERS[i % SIDE_FLOWERS.length];
+        s.style.animationDelay = `${i * 0.08}s, ${i * 0.1}s`;
+        el.appendChild(s);
+      }
+    });
   }
 
-  // BOTTOM
-  const bot = document.getElementById('sideBottom');
-  bot.style.bottom = '-28px';
-  bot.style.left = '0'; bot.style.right = '0';
-  bot.style.gap = gap + 'px';
-  bot.innerHTML = '';
-  for (let i = 0; i < hCount; i++) {
-    const s = document.createElement('span');
-    s.className = 'frame-flower';
-    s.textContent = TOP_FLOWERS[i % TOP_FLOWERS.length];
-    s.style.animationDelay = `${i * 0.08 + 0.3}s, ${i * 0.1 + 0.5}s`;
-    bot.appendChild(s);
+  // Floating BG
+  const flEmojis = ['🌻','🌼','🌸','💛','⭐','✨'];
+  const bgDiv = document.getElementById('bgFlowers');
+  for (let i = 0; i < 35; i++) {
+    const f = document.createElement('div');
+    f.className = 'bf';
+    f.textContent = flEmojis[Math.floor(Math.random() * flEmojis.length)];
+    f.style.left = Math.random() * 100 + 'vw';
+    f.style.fontSize = (0.9 + Math.random() * 1.8) + 'rem';
+    f.style.animationDuration = (6 + Math.random() * 10) + 's';
+    f.style.animationDelay = (Math.random() * 12) + 's';
+    bgDiv.appendChild(f);
   }
 
-  // LEFT
-  const left = document.getElementById('sideLeft');
-  left.style.left = '-28px';
-  left.style.top = '0'; left.style.bottom = '0';
-  left.style.gap = gap + 'px';
-  left.innerHTML = '';
-  for (let i = 0; i < vCount; i++) {
-    const s = document.createElement('span');
-    s.className = 'frame-flower';
-    s.textContent = SIDE_FLOWERS[i % SIDE_FLOWERS.length];
-    s.style.animationDelay = `${i * 0.08 + 0.1}s, ${i * 0.1 + 0.2}s`;
-    left.appendChild(s);
-  }
+  function reveal() {
+    const raw = document.getElementById('nameInput').value.trim();
+    const key = raw.toLowerCase();
 
-  // RIGHT
-  const right = document.getElementById('sideRight');
-  right.style.right = '-28px';
-  right.style.top = '0'; right.style.bottom = '0';
-  right.style.gap = gap + 'px';
-  right.innerHTML = '';
-  for (let i = 0; i < vCount; i++) {
-    const s = document.createElement('span');
-    s.className = 'frame-flower';
-    s.textContent = SIDE_FLOWERS[i % SIDE_FLOWERS.length];
-    s.style.animationDelay = `${i * 0.08 + 0.2}s, ${i * 0.1 + 0.3}s`;
-    right.appendChild(s);
-  }
-}
+    if (!raw) { doShake(); return; }
 
-// FLOATING BG
-const flEmojis = ['🌻','🌼','🌸','💛','⭐','✨'];
-const bgDiv = document.getElementById('bgFlowers');
-for (let i = 0; i < 35; i++) {
-  const f = document.createElement('div');
-  f.className = 'bf';
-  f.textContent = flEmojis[Math.floor(Math.random() * flEmojis.length)];
-  f.style.left = Math.random() * 100 + 'vw';
-  f.style.fontSize = (0.9 + Math.random() * 1.8) + 'rem';
-  f.style.animationDuration = (6 + Math.random() * 10) + 's';
-  f.style.animationDelay = (Math.random() * 12) + 's';
-  bgDiv.appendChild(f);
-}
+    if (!NOMBRES[key]) {
+      doShake();
+      document.getElementById('nameInput').value = '';
+      document.getElementById('nameInput').placeholder = '¡Nombre no encontrado! 🌻';
+      return;
+    }
 
-function reveal() {
-  const raw = document.getElementById('nameInput').value.trim();
-  if (!raw) { doShake(); return; }
-  if (raw.toLowerCase() !== 'jimena') {
-    doShake();
-    document.getElementById('nameInput').value = '';
-    document.getElementById('nameInput').placeholder = '¡Solo para Jimena! 🌻';
-    return;
-  }
+    const persona = NOMBRES[key];
+    document.getElementById('nameSub').textContent = `${persona.emoji} ${persona.display} ${persona.emoji}`;
 
-  const s1 = document.getElementById('screen-input');
-  s1.style.opacity = '0';
-  s1.style.transform = 'scale(0.9)';
-  setTimeout(() => {
-    s1.style.display = 'none';
-    const s2 = document.getElementById('screen-feliz');
-    s2.classList.add('show');
-    // build frame after element is visible
-    setTimeout(buildFrame, 50);
-  }, 400);
-
-  launchBurst();
-}
-
-function doShake() {
-  const inp = document.getElementById('nameInput');
-  inp.classList.remove('shake'); void inp.offsetWidth; inp.classList.add('shake');
-  inp.style.borderColor = '#ff9900';
-  setTimeout(() => inp.style.borderColor = '', 800);
-}
-
-function launchBurst() {
-  const fx = ['🌻','🌼','💛','⭐','✨','🌟'];
-  for (let i = 0; i < 40; i++) {
+    const s1 = document.getElementById('screen-input');
+    s1.style.opacity = '0';
+    s1.style.transform = 'scale(0.9)';
     setTimeout(() => {
-      const el = document.createElement('div');
-      el.className = 'burst';
-      el.textContent = fx[Math.floor(Math.random() * fx.length)];
-      el.style.left  = (Math.random() * 100) + 'vw';
-      el.style.top   = (Math.random() * 100) + 'vh';
-      el.style.setProperty('--dx', (Math.random() * 400 - 200) + 'px');
-      el.style.setProperty('--dy', (Math.random() * -400 - 50) + 'px');
-      el.style.setProperty('--dr', (Math.random() * 720 - 360) + 'deg');
-      document.body.appendChild(el);
-      setTimeout(() => el.remove(), 1700);
-    }, i * 55);
+      s1.style.display = 'none';
+      document.getElementById('screen-feliz').classList.add('show');
+      setTimeout(buildFrame, 50);
+    }, 400);
+
+    launchBurst();
   }
-}
 
-document.getElementById('nameInput').addEventListener('keydown', e => {
-  if (e.key === 'Enter') reveal();
-});
+  function doShake() {
+    const inp = document.getElementById('nameInput');
+    inp.classList.remove('shake'); void inp.offsetWidth; inp.classList.add('shake');
+    inp.style.borderColor = '#ff9900';
+    setTimeout(() => inp.style.borderColor = '', 800);
+  }
 
-window.addEventListener('resize', () => {
-  if (document.getElementById('screen-feliz').classList.contains('show')) buildFrame();
-});
+  function launchBurst() {
+    const fx = ['🌻','🌼','💛','⭐','✨','🌟'];
+    for (let i = 0; i < 40; i++) {
+      setTimeout(() => {
+        const el = document.createElement('div');
+        el.className = 'burst';
+        el.textContent = fx[Math.floor(Math.random() * fx.length)];
+        el.style.left  = (Math.random() * 100) + 'vw';
+        el.style.top   = (Math.random() * 100) + 'vh';
+        el.style.setProperty('--dx', (Math.random() * 400 - 200) + 'px');
+        el.style.setProperty('--dy', (Math.random() * -400 - 50) + 'px');
+        el.style.setProperty('--dr', (Math.random() * 720 - 360) + 'deg');
+        document.body.appendChild(el);
+        setTimeout(() => el.remove(), 1700);
+      }, i * 55);
+    }
+  }
+
+  document.getElementById('nameInput').addEventListener('keydown', e => {
+    if (e.key === 'Enter') reveal();
+  });
+
+  window.addEventListener('resize', () => {
+    if (document.getElementById('screen-feliz').classList.contains('show')) buildFrame();
+  });
 </script>
 </body>
 </html>
