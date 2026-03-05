@@ -1,384 +1,165 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>¿Quién es?</title>
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,900;1,400;1,900&family=Cormorant+Garamond:wght@300;400&display=swap" rel="stylesheet">
-<style>
-  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>El Fenómeno de los Sueños</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700;900&family=Cormorant+Garamond:ital@1&display=swap" rel="stylesheet"/>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
 
-  :root {
-    --ink: #1a1208;
-    --cream: #f5f0e8;
-    --gold: #c9a84c;
-    --rust: #8b3a1e;
-  }
+    body {
+      min-height: 100vh;
+      background: #07040f;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Cinzel Decorative', serif;
+      overflow: hidden;
+    }
 
-  body {
-    background-color: var(--ink);
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    font-family: 'Cormorant Garamond', serif;
-    overflow: hidden;
-    cursor: none;
-  }
+    .stars { position: fixed; inset: 0; pointer-events: none; z-index: 0; }
+    .stars span {
+      position: absolute; border-radius: 50%; background: #fff;
+      animation: tw var(--d) ease-in-out infinite; opacity: 0;
+    }
+    @keyframes tw { 0%,100%{opacity:0} 50%{opacity:var(--o)} }
 
-  body::before {
-    content: '';
-    position: fixed;
-    inset: 0;
-    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.05'/%3E%3C/svg%3E");
-    pointer-events: none;
-    z-index: 9997;
-    opacity: 0.5;
-  }
+    .moon {
+      position: fixed; top: 5vh; right: 7vw;
+      width: 80px; height: 80px; border-radius: 50%;
+      background: radial-gradient(circle at 35% 35%, #f0eaff, #c5aff0 60%, #8060c0);
+      box-shadow: 0 0 40px #c5aff088, 0 0 90px #8060c044;
+      animation: glow 4s ease-in-out infinite alternate; z-index: 1;
+    }
+    @keyframes glow {
+      from { box-shadow: 0 0 40px #c5aff088; }
+      to   { box-shadow: 0 0 70px #f0eaffcc, 0 0 130px #c5aff066; }
+    }
 
-  .cursor {
-    position: fixed;
-    width: 10px;
-    height: 10px;
-    border-radius: 50%;
-    background: var(--gold);
-    pointer-events: none;
-    z-index: 9999;
-    mix-blend-mode: difference;
-  }
+    /* PANTALLA 1 */
+    .screen {
+      position: relative; z-index: 2;
+      text-align: center; padding: 24px;
+      transition: opacity 0.4s ease, transform 0.4s ease;
+    }
+    .screen.hide {
+      opacity: 0; transform: scale(0.9); pointer-events: none;
+      position: absolute;
+    }
 
-  .bg-word {
-    position: fixed;
-    font-family: 'Playfair Display', serif;
-    font-weight: 900;
-    font-size: clamp(120px, 22vw, 300px);
-    color: transparent;
-    -webkit-text-stroke: 1px rgba(201,168,76,0.07);
-    user-select: none;
-    pointer-events: none;
-    z-index: 0;
-  }
-  .bg-word.tl { top: -5%; left: -3%; transform: rotate(-8deg); }
-  .bg-word.br { bottom: 5%; right: -4%; transform: rotate(5deg); font-style: italic; }
+    .eyebrow {
+      font-size: 0.6rem; letter-spacing: 0.5em; color: #f5c842;
+      margin-bottom: 28px; animation: fadeUp 1s ease 0.3s both;
+    }
+    h1 {
+      font-size: clamp(2rem, 8vw, 4.5rem); font-weight: 900;
+      background: linear-gradient(135deg, #f0eaff, #c5aff0, #f5c842, #f0eaff);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+      line-height: 1.2; margin-bottom: 60px;
+      filter: drop-shadow(0 0 25px #c5aff055);
+      animation: fadeUp 1s ease 0.6s both;
+    }
+    .btn {
+      font-family: 'Cinzel Decorative', serif;
+      font-size: 1rem; letter-spacing: 0.25em;
+      padding: 20px 56px; color: #07040f;
+      background: linear-gradient(135deg, #f5c842, #e8a800, #f5c842);
+      background-size: 200%; border: none; border-radius: 60px; cursor: pointer;
+      box-shadow: 0 0 30px #f5c84266, 0 8px 30px #0009;
+      animation: fadeUp 1s ease 0.9s both, shimmer 3s ease infinite;
+      transition: transform 0.3s, box-shadow 0.3s;
+    }
+    @keyframes shimmer { 0%,100%{background-position:0%} 50%{background-position:100%} }
+    .btn:hover { transform: scale(1.07) translateY(-4px); box-shadow: 0 0 55px #f5c842aa; }
+    .btn:active { transform: scale(0.96); }
 
-  /* === SCREEN 1 === */
-  #screen-input {
-    position: relative;
-    z-index: 2;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 2.5rem;
-    animation: fadeInUp 0.8s ease both;
-  }
+    /* PANTALLA 2 */
+    .screen2 {
+      position: absolute; z-index: 2;
+      text-align: center; padding: 24px;
+      opacity: 0; transform: scale(1.1);
+      pointer-events: none;
+      transition: opacity 0.5s ease 0.3s, transform 0.5s cubic-bezier(.34,1.56,.64,1) 0.3s;
+    }
+    .screen2.show {
+      opacity: 1; transform: scale(1); pointer-events: auto;
+    }
+    .big {
+      font-size: clamp(2rem, 9vw, 5rem); font-weight: 900;
+      color: #f5c842;
+      text-shadow: 0 0 30px #f5c842bb, 0 0 60px #f5c84255;
+      animation: shake 0.5s ease;
+    }
+    .smol {
+      font-family: 'Cormorant Garamond', serif;
+      font-style: italic; font-size: 1.15rem;
+      color: #c5aff0; margin-top: 16px; letter-spacing: 0.15em;
+    }
+    @keyframes shake {
+      0%,100%{transform:rotate(0)} 20%{transform:rotate(-3deg)} 40%{transform:rotate(3deg)}
+      60%{transform:rotate(-2deg)} 80%{transform:rotate(2deg)}
+    }
 
-  .title {
-    font-family: 'Playfair Display', serif;
-    font-size: clamp(2.5rem, 8vw, 6rem);
-    font-style: italic;
-    color: var(--cream);
-    letter-spacing: 0.02em;
-    text-align: center;
-  }
-  .title span { color: var(--gold); }
+    /* PARTICLES */
+    .particle {
+      position: fixed; border-radius: 50%; pointer-events: none; z-index: 999;
+      animation: burst 0.9s ease forwards;
+    }
+    @keyframes burst {
+      0%   { opacity:1; transform:translate(0,0) scale(1); }
+      100% { opacity:0; transform:translate(var(--dx),var(--dy)) scale(0); }
+    }
 
-  .rule {
-    width: 80px;
-    height: 1px;
-    background: linear-gradient(to right, transparent, var(--gold), transparent);
-  }
-
-  .input-wrap {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 1rem;
-    width: 100%;
-    max-width: 400px;
-  }
-
-  input[type="text"] {
-    background: transparent;
-    border: none;
-    border-bottom: 1px solid rgba(201,168,76,0.4);
-    outline: none;
-    color: var(--cream);
-    font-family: 'Playfair Display', serif;
-    font-size: clamp(1.5rem, 4vw, 2.5rem);
-    font-style: italic;
-    text-align: center;
-    padding: 0.5rem 1rem;
-    width: 100%;
-    caret-color: var(--gold);
-    transition: border-color 0.3s ease;
-  }
-  input[type="text"]::placeholder {
-    color: rgba(245,240,232,0.2);
-    font-style: italic;
-  }
-  input[type="text"]:focus { border-bottom-color: var(--gold); }
-  input.error {
-    border-bottom-color: var(--rust) !important;
-    animation: shake 0.4s ease;
-  }
-
-  .error-msg {
-    font-size: 0.85rem;
-    color: var(--rust);
-    letter-spacing: 0.25em;
-    text-transform: uppercase;
-    opacity: 0;
-    transition: opacity 0.3s ease;
-    height: 1.2em;
-  }
-  .error-msg.show { opacity: 1; }
-
-  button {
-    background: var(--gold);
-    color: var(--ink);
-    border: none;
-    font-family: 'Playfair Display', serif;
-    font-weight: 900;
-    font-size: 1rem;
-    letter-spacing: 0.3em;
-    text-transform: uppercase;
-    padding: 1rem 2.5rem;
-    cursor: none;
-    position: relative;
-    overflow: hidden;
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
-  }
-  button::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background: rgba(255,255,255,0.18);
-    transform: translateX(-100%);
-    transition: transform 0.3s ease;
-  }
-  button:hover::before { transform: translateX(0); }
-  button:hover { transform: translateY(-2px); box-shadow: 0 8px 30px rgba(201,168,76,0.3); }
-  button:active { transform: translateY(0); }
-
-  /* === SCREEN 2 === */
-  #screen-reveal {
-    position: fixed;
-    inset: 0;
-    z-index: 10;
-    display: none;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    background: var(--ink);
-    overflow: hidden;
-  }
-
-  .reveal-bg-text {
-    position: fixed;
-    font-family: 'Playfair Display', serif;
-    font-weight: 900;
-    font-size: clamp(150px, 38vw, 520px);
-    color: transparent;
-    -webkit-text-stroke: 1px rgba(201,168,76,0.06);
-    user-select: none;
-    pointer-events: none;
-    white-space: nowrap;
-    z-index: 0;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    animation: pulse 4s ease-in-out infinite;
-  }
-  @keyframes pulse {
-    0%, 100% { -webkit-text-stroke-color: rgba(201,168,76,0.05); }
-    50%       { -webkit-text-stroke-color: rgba(201,168,76,0.13); }
-  }
-
-  .particles { position: fixed; inset: 0; pointer-events: none; z-index: 1; }
-  .particle {
-    position: absolute;
-    border-radius: 50%;
-    background: var(--gold);
-    opacity: 0;
-    animation: float linear infinite;
-  }
-  @keyframes float {
-    0%   { transform: translateY(110vh) rotate(0deg); opacity: 0; }
-    10%  { opacity: 0.6; }
-    90%  { opacity: 0.3; }
-    100% { transform: translateY(-10vh) rotate(720deg); opacity: 0; }
-  }
-
-  .reveal-main {
-    font-family: 'Playfair Display', serif;
-    font-weight: 900;
-    font-style: italic;
-    font-size: clamp(2.5rem, 9vw, 7rem);
-    color: var(--gold);
-    text-align: center;
-    line-height: 1.05;
-    z-index: 2;
-    position: relative;
-    opacity: 0;
-    transform: scale(0.85);
-    transition: opacity 0.7s ease 0.3s, transform 0.7s ease 0.3s;
-    padding: 0 2rem;
-  }
-  .reveal-main.show { opacity: 1; transform: scale(1); }
-
-  .reveal-sub {
-    font-family: 'Cormorant Garamond', serif;
-    font-weight: 300;
-    font-size: clamp(0.8rem, 2vw, 1.1rem);
-    letter-spacing: 0.5em;
-    text-transform: uppercase;
-    color: rgba(245,240,232,0.4);
-    margin-top: 2rem;
-    z-index: 2;
-    opacity: 0;
-    transition: opacity 0.6s ease 0.9s;
-  }
-  .reveal-sub.show { opacity: 1; }
-
-  .marquee-wrap {
-    position: fixed;
-    bottom: 0;
-    width: 100%;
-    overflow: hidden;
-    border-top: 1px solid rgba(201,168,76,0.15);
-    padding: 0.8rem 0;
-    z-index: 3;
-    opacity: 0;
-    transition: opacity 0.5s ease 1.2s;
-  }
-  .marquee-wrap.show { opacity: 1; }
-  .marquee {
-    display: flex;
-    gap: 3rem;
-    width: max-content;
-    animation: marquee 10s linear infinite;
-  }
-  .marquee span {
-    font-family: 'Playfair Display', serif;
-    font-style: italic;
-    color: rgba(201,168,76,0.35);
-    font-size: 1rem;
-    letter-spacing: 0.1em;
-    white-space: nowrap;
-  }
-  @keyframes marquee {
-    from { transform: translateX(0); }
-    to   { transform: translateX(-50%); }
-  }
-
-  @keyframes fadeInUp {
-    from { opacity: 0; transform: translateY(30px); }
-    to   { opacity: 1; transform: translateY(0); }
-  }
-  @keyframes shake {
-    0%, 100% { transform: translateX(0); }
-    20%      { transform: translateX(-8px); }
-    40%      { transform: translateX(8px); }
-    60%      { transform: translateX(-5px); }
-    80%      { transform: translateX(5px); }
-  }
-</style>
+    @keyframes fadeUp {
+      from { opacity:0; transform:translateY(24px); }
+      to   { opacity:1; transform:translateY(0); }
+    }
+  </style>
 </head>
 <body>
 
-<div class="cursor" id="cursor"></div>
-<div class="bg-word tl">vaga</div>
-<div class="bg-word br">vaga</div>
+  <div class="stars" id="stars"></div>
+  <div class="moon"></div>
 
-<!-- PANTALLA 1 -->
-<div id="screen-input">
-  <h1 class="title">¿Quién es<span>?</span></h1>
-  <div class="rule"></div>
-  <div class="input-wrap">
-    <input type="text" id="nameInput" placeholder="escribe tu nombre..." autocomplete="off" spellcheck="false" />
-    <div class="error-msg" id="errorMsg">nombre incorrecto</div>
-    <button onclick="check()">Descubrir</button>
+  <!-- PANTALLA 1: título + botón -->
+  <div class="screen" id="s1">
+    <p class="eyebrow">✦ misterios de la noche ✦</p>
+    <h1>El Fenómeno<br/>de los Sueños</h1>
+    <button class="btn" onclick="revelar()">✦ Descubrir ✦</button>
   </div>
-</div>
 
-<!-- PANTALLA 2 -->
-<div id="screen-reveal">
-  <div class="reveal-bg-text">vaga</div>
-  <div class="particles" id="particles"></div>
-  <p class="reveal-main" id="revealText">La más vaga<br>del mundo</p>
-  <p class="reveal-sub" id="revealSub">— Jimena —</p>
-  <div class="marquee-wrap" id="marqueeWrap">
-    <div class="marquee">
-      <span>vaga</span><span>·</span><span>vaga</span><span>·</span>
-      <span>vaga</span><span>·</span><span>vaga</span><span>·</span>
-      <span>vaga</span><span>·</span><span>vaga</span><span>·</span>
-      <span>vaga</span><span>·</span><span>vaga</span><span>·</span>
-      <span>vaga</span><span>·</span><span>vaga</span><span>·</span>
-      <span>vaga</span><span>·</span><span>vaga</span><span>·</span>
-      <span>vaga</span><span>·</span><span>vaga</span><span>·</span>
-    </div>
+  <!-- PANTALLA 2: la broma -->
+  <div class="screen2" id="s2">
+    <p class="big">😴 ¡Investiga, Vaga! 😴</p>
+    <p class="smol">Eso no se pregunta… ¡se estudia!</p>
   </div>
-</div>
 
-<script>
-  // Cursor
-  const cursor = document.getElementById('cursor');
-  document.addEventListener('mousemove', e => {
-    cursor.style.left = e.clientX - 5 + 'px';
-    cursor.style.top  = e.clientY - 5 + 'px';
-  });
-
-  // Validar nombre
-  function check() {
-    const input = document.getElementById('nameInput');
-    const errorMsg = document.getElementById('errorMsg');
-    const val = input.value.trim().toLowerCase();
-
-    if (val === 'jimena') {
-      showReveal();
-    } else {
-      input.classList.remove('error');
-      void input.offsetWidth;
-      input.classList.add('error');
-      errorMsg.classList.add('show');
-      setTimeout(() => {
-        input.classList.remove('error');
-        errorMsg.classList.remove('show');
-      }, 1800);
-    }
-  }
-
-  document.getElementById('nameInput').addEventListener('keydown', e => {
-    if (e.key === 'Enter') check();
-  });
-
-  function showReveal() {
-    const screen = document.getElementById('screen-reveal');
-    screen.style.display = 'flex';
-
-    // Partículas
-    const container = document.getElementById('particles');
-    for (let i = 0; i < 35; i++) {
-      const p = document.createElement('div');
-      p.className = 'particle';
-      p.style.left = Math.random() * 100 + 'vw';
-      const size = Math.random() * 5 + 2;
-      p.style.width = size + 'px';
-      p.style.height = size + 'px';
-      p.style.animationDuration = (Math.random() * 8 + 5) + 's';
-      p.style.animationDelay = (Math.random() * 4) + 's';
-      container.appendChild(p);
+  <script>
+    const sc = document.getElementById('stars');
+    for (let i = 0; i < 140; i++) {
+      const s = document.createElement('span');
+      const sz = Math.random() * 2.5 + 0.5;
+      s.style.cssText = `width:${sz}px;height:${sz}px;top:${Math.random()*100}%;left:${Math.random()*100}%;--d:${(Math.random()*4+2).toFixed(1)}s;--o:${(Math.random()*0.6+0.2).toFixed(2)};animation-delay:${(Math.random()*5).toFixed(2)}s`;
+      sc.appendChild(s);
     }
 
-    requestAnimationFrame(() => {
-      requestAnimationFrame(() => {
-        document.getElementById('revealText').classList.add('show');
-        document.getElementById('revealSub').classList.add('show');
-        document.getElementById('marqueeWrap').classList.add('show');
-      });
-    });
-  }
-</script>
+    function revelar() {
+      // particles
+      for (let i = 0; i < 30; i++) {
+        const p = document.createElement('div');
+        p.className = 'particle';
+        const ang = Math.random() * 360, dist = Math.random() * 160 + 60;
+        const col = ['#f5c842','#c5aff0','#ffffff'][Math.floor(Math.random()*3)];
+        const sz = Math.random() * 10 + 4;
+        p.style.cssText = `width:${sz}px;height:${sz}px;background:${col};left:50%;top:50%;--dx:${Math.cos(ang*Math.PI/180)*dist}px;--dy:${Math.sin(ang*Math.PI/180)*dist}px`;
+        document.body.appendChild(p);
+        setTimeout(() => p.remove(), 950);
+      }
+
+      document.getElementById('s1').classList.add('hide');
+      setTimeout(() => document.getElementById('s2').classList.add('show'), 200);
+    }
+  </script>
 </body>
 </html>
